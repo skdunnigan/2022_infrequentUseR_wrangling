@@ -1,6 +1,8 @@
 ---
 title: "One big practice file: Day 1"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -65,10 +67,69 @@ Also, use what you learned from the Data Visualization portion of this workshop 
 Note: you can insert a new code chunk below with (windows) `Ctrl+Alt+I` or (mac) `Cmd+Alt+I`. If you prefer menus, go to `Code` in RStudio's toolbar, and select `Insert Chunk`.   
 
 ```{r}
+penguins
+penguins <- penguins
 
+
+penguins %>% 
+    ggplot(aes(x = flipper_length_mm, y = bill_length_mm, 
+               color = species, shape = species)) +
+    geom_point(size = 2) +
+    scale_color_okabeito() +
+    theme_classic() +
+    theme(legend.position = "none",
+          axis.text = element_text(color = "black")) +
+    labs(x = "Flipper Length (mm)",
+         y = "Bill Length (mm)") +
+    annotate("text", 
+             label = "Adelie",
+             x = 180,
+             y = 35,
+             fontface = "bold",
+             size = 6) +
+    annotate("text",
+             label = "Chinstrap",
+             x = 190,
+             y = 53, 
+             fontface = "bold",
+             color = "#E69F00",
+             size = 6) +
+    annotate("text",
+             label = "Gentoo",
+             x = 225,
+             y = 46,
+             fontface = "bold",
+             color = "#56B4E9",
+             size = 6)
 
 ```
 
+``` {r}
+length <- read_csv(here::here('data', 'GNDfish_lengths.csv'))
+
+unique(length$species)
+
+length %>% 
+    group_by(species) %>% 
+    dplyr::summarize(count = n()) %>% 
+    arrange(count)
+
+length %>% 
+    filter(species %in% c("Brevoortia patronus",
+                          "Mugil cephalus",
+                          "Leiostomus xanthurus") &
+               length_sl_mm < 300) %>%
+    ggplot() +
+    geom_freqpoly(aes(x = length_sl_mm, color = species),
+                  size = 1) +
+    facet_wrap(.~species, ncol = 1) +
+    scale_color_okabeito() +
+    theme_bw() +
+    theme(legend.position = "none", 
+          strip.text = element_text(face = "italic")) +
+    labs(x = "St. Length (mm)",
+         y = "Count")
+```
 
 
 ## On your data  
@@ -93,7 +154,8 @@ Make a subset of the `penguins` data frame that only includes the columns `speci
 Hint: you can exclude columns by using a - inside `dplyr::select()`!  
 
 ```{r}
-
+penguins %>% 
+    select(species, bill_length_mm, flipper_length_mm, body_mass_g)
 
 ```
 
@@ -101,7 +163,8 @@ Hint: you can exclude columns by using a - inside `dplyr::select()`!
 Make a subset of the `penguins` data frame that only includes Adelie penguins.  
 
 ```{r}
-
+penguins %>% 
+    filter(species == "Adelie")
 
 ```
 
@@ -109,7 +172,9 @@ Make a subset of the `penguins` data frame that only includes Adelie penguins.
 Combine the skills used above: make a subset of the `penguins` data frame that includes the columns `species`, `island`, `flipper_length_mm`, `body_mass_g`, and `sex`; and *only* includes Adelie penguins from the island Biscoe.  
 
 ```{r}
-
+penguins %>% 
+    select(species, bill_length_mm, flipper_length_mm, body_mass_g) %>% 
+    filter(species == "Adelie")
 
 ```
 
@@ -117,7 +182,8 @@ Combine the skills used above: make a subset of the `penguins` data frame that i
 From the `fish_wq` data frame, make a subset that only includes `site`, `season`, `year_sampled`, and `water_temp_c` from winter sampling events.  
 
 ```{r}
-
+fish_wq %>% 
+    select(site, season, year_sampled, water_temp_c)
 
 ```
 
@@ -147,7 +213,8 @@ Add new fields to the data frames using `dplyr::mutate()`! Some things you might
 To `fish_wq` and/or the `bcwq` data frames, add a column for temperature in Fahrenheit. You can calculate this from the temperature in Celsius.  
 
 ```{r}
-
+fish_wq %>% 
+    mutate(temp_f = (water_temp_c * (9/5)) +32)
 
 ```
 
